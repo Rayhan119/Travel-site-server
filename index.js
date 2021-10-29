@@ -2,6 +2,7 @@
 const express = require("express");
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
+const ObjectId = require("mongodb").ObjectId;
 const cors = require("cors");
 //app init
 const app = express();
@@ -23,11 +24,18 @@ async function run() {
     await client.connect();
     const database = client.db("travelerz");
     const servicesCollection = database.collection("services");
-    //get api
+    //get api for load services
     app.get("/services", async (req, res) => {
       const cursor = servicesCollection.find({});
       const services = await cursor.toArray();
       res.send(services);
+    });
+    //get api for single service
+    app.get("/services/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const service = await servicesCollection.findOne(query);
+      res.json(service);
     });
   } finally {
     //   await client.close();
