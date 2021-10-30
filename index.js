@@ -24,6 +24,7 @@ async function run() {
     await client.connect();
     const database = client.db("travelerz");
     const servicesCollection = database.collection("services");
+    const usersCollection = database.collection("users");
     //get api for load services
     app.get("/services", async (req, res) => {
       const cursor = servicesCollection.find({});
@@ -36,6 +37,25 @@ async function run() {
       const query = { _id: ObjectId(id) };
       const service = await servicesCollection.findOne(query);
       res.json(service);
+    });
+    app.post("/users", async (req, res) => {
+      const users = req.body;
+      const result = await usersCollection.insertOne(users);
+      console.log("hit the post", users);
+      res.send(result);
+    });
+    //get users
+    app.get("/users", async (req, res) => {
+      const cursor = usersCollection.find({});
+      const users = await cursor.toArray();
+      res.send(users);
+    });
+    //delete api
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await usersCollection.deleteOne(query);
+      res.json(result);
     });
   } finally {
     //   await client.close();
