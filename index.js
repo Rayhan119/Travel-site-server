@@ -38,6 +38,14 @@ async function run() {
       const service = await servicesCollection.findOne(query);
       res.json(service);
     });
+    //post services
+    app.post("/services", async (req, res) => {
+      const services = req.body;
+      const result = await servicesCollection.insertOne(services);
+      console.log("hit the post", services);
+      res.send(result);
+    });
+
     app.post("/users", async (req, res) => {
       const users = req.body;
       const result = await usersCollection.insertOne(users);
@@ -56,6 +64,14 @@ async function run() {
       const query = { _id: ObjectId(id) };
       const result = await usersCollection.deleteOne(query);
       res.json(result);
+    });
+    //get api with email
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const result = await usersCollection
+        .find({ email: req.params.email })
+        .toArray();
+      res.send(result);
     });
   } finally {
     //   await client.close();
